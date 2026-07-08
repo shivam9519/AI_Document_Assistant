@@ -1,10 +1,10 @@
-#AI Document Assistant 
+# AI Document Assistant 
 
-##Overview
+## Overview
 
 AI Document Assistant  is a Retrieval-Augmented Generation(RAG) application that allows users to upload PDF documents and ask questions about them. Instead of reading the entire document ,users can get accurate answer based on the document's content.
 
-##Features 
+## Features 
 -Upload PDF
 -Extract text
 -Split text into chunks
@@ -20,6 +20,6 @@ AI Document Assistant  is a Retrieval-Augmented Generation(RAG) application that
 -CSS
 -JavaScript
 
-##Status
+## Status
 
 Under Development
