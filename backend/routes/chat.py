@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from backend.models.schemas import QuestionRequest
-from backend.services.embedding_service import generate_question_embedding
+from backend.services.embedding_services import generate_question_embedding
 from backend.services.faiss_service import (
     search_index,
     retrieve_chunks
