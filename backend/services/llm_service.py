@@ -10,7 +10,7 @@ client = genai.Client(
 )
 
 
-def generate_answer(question: str, context: str) -> str:
+def generate_answer(question: str, context: str):
 
     prompt = f"""
 You are an AI Document Assistant.
@@ -20,7 +20,9 @@ Answer ONLY using the provided context.
 Rules:
 1. Give a clear and concise answer.
 2. Do not use outside knowledge.
-3. If the answer is not found in the context, reply exactly:
+3. Mention the page number(s) whenever possible.
+4. If the answer is not found in the context, reply exactly:
+
 "I couldn't find this information in the uploaded document."
 
 Context:
