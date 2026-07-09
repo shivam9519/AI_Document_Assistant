@@ -43,8 +43,6 @@ def save_faiss_index(index, document_hash):
 
 def index_exists(document_hash):
 
-    import os
-
     path = os.path.join(
         "backend",
         "storage",
