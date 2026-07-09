@@ -4,10 +4,16 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def generate_embeddings(chunks: list):
-    embeddings = model.encode(chunks)
+
+    texts = [chunk["text"] for chunk in chunks]
+
+    embeddings = model.encode(texts)
 
     return embeddings
+
+
 def generate_question_embedding(question: str):
+
     embedding = model.encode([question])
 
     return embedding

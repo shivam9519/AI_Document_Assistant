@@ -15,24 +15,52 @@ def save_file(file: UploadFile) -> str:
 
     return str(file_path)
 
-def extract_text_from_pdf(file_path: str) -> str:
+def extract_text_from_pdf(file_path: str):
+
     document = fitz.open(file_path)
 
-    text = ""
+    pages = []
 
-    for page in document:
-        text += page.get_text()
+    for page_number, page in enumerate(document, start=1):
+
+        page_text = page.get_text("text")
+        page_text = page_text.replace("\n", " ")
+        page_text = " ".join(page_text.split())
+
+        pages.append({
+            "page": page_number,
+            "text": page_text
+        })
 
     document.close()
 
-    return text
+    return pages
 
-def chunk_text(text: str, chunk_size: int = 500):
+def chunk_text(pages, chunk_size=500, overlap=100):
+
+    if overlap >= chunk_size:
+        raise ValueError(
+        "overlap must be smaller than chunk_size"
+    )
+
     chunks = []
 
-    for i in range(0, len(text), chunk_size):
-        chunk = text[i:i + chunk_size]
-        chunks.append(chunk)
+    step = chunk_size - overlap
+
+    for page in pages:
+
+        page_number = page["page"]
+        text = page["text"]
+
+        for i in range(0, len(text), step):
+
+            chunk = text[i:i + chunk_size]
+
+            if chunk.strip():
+
+                chunks.append({
+                    "page": page_number,
+                    "text": chunk
+                })
 
     return chunks
-

@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 from google import genai
 
@@ -9,10 +10,31 @@ client = genai.Client(
 )
 
 
-def generate_answer(prompt: str) -> str:
+def generate_answer(question: str, context: str) -> str:
+
+    prompt = f"""
+You are an AI Document Assistant.
+
+Answer ONLY using the provided context.
+
+Rules:
+1. Give a clear and concise answer.
+2. Do not use outside knowledge.
+3. If the answer is not found in the context, reply exactly:
+"I couldn't find this information in the uploaded document."
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:
+"""
+
     response = client.models.generate_content(
         model="gemini-2.5-flash",
-        contents=prompt,
+        contents=prompt
     )
 
     return response.text

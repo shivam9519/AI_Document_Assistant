@@ -1,5 +1,6 @@
 import faiss
 import numpy as np
+from backend.config import TOP_K
 
 
 def create_faiss_index(embeddings):
@@ -13,13 +14,14 @@ def create_faiss_index(embeddings):
 
 
 
-def search_index(index, question_embedding, k=3):
+def search_index(index, question_embedding):
+
     distances, indices = index.search(
         question_embedding.astype("float32"),
-        k
+        TOP_K
     )
 
-    return indices[0]
+    return distances[0], indices[0]
 
 def retrieve_chunks(chunks, indices):
     return [chunks[i] for i in indices]
