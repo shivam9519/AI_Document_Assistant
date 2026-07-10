@@ -1,45 +1,63 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+import logging
 
+import backend.services.store as store
+
+from backend.config import SIMILARITY_THRESHOLD
 from backend.models.schemas import QuestionRequest
-from backend.services.embedding_services import generate_question_embedding
+
+from backend.services.embedding_services import (
+    generate_question_embedding
+)
+
 from backend.services.faiss_service import (
     search_index,
     retrieve_chunks
 )
-from backend.services.llm_service import generate_answer
-from backend.config import SIMILARITY_THRESHOLD
 
-import backend.services.store as store
+from backend.services.llm_service import generate_answer
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.post("/chat")
+@router.post(
+    "/chat",
+    summary="Chat with a PDF",
+    description="Ask questions about a previously uploaded PDF."
+)
 async def chat(data: QuestionRequest):
 
-    # Check whether a PDF has been uploaded
-    if store.faiss_index is None:
-        return {
-            "error": "Please upload a PDF before asking questions."
-        }
 
-    if not store.chunks:
-        return {
-            "error": "No document content available."
-        }
+    # Check document exists
+    if data.document_id not in store.documents:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found."
+        )
+
+    # Get selected document
+    document = store.documents[data.document_id]
+
+    index = document["faiss_index"]
+    chunks = document["chunks"]
+
 
     # Generate question embedding
     question_embedding = generate_question_embedding(
         data.question
     )
 
+
     # Search FAISS
     distances, indices = search_index(
-        store.faiss_index,
+        index,
         question_embedding
     )
 
-    # Similarity threshold check
+
+    # Similarity threshold
     if distances[0] > SIMILARITY_THRESHOLD:
         return {
             "answer": "I couldn't find this information in the uploaded document."
@@ -47,11 +65,11 @@ async def chat(data: QuestionRequest):
 
     # Retrieve chunks
     top_chunks = retrieve_chunks(
-        store.chunks,
+        chunks,
         indices
     )
 
-    # Build context with page numbers
+    # Build context
     context = ""
 
     for chunk in top_chunks:
@@ -68,15 +86,23 @@ Page {chunk['page']}:
         context
     )
 
-    # Remove duplicate page numbers
+    logger.info(
+        f"Question answered for document {data.document_id}"
+    )
+
+    # Remove duplicate pages
     sources = sorted(
         set(
             chunk["page"] for chunk in top_chunks
         )
     )
 
-    return {
+
+    response = {
+        "document_id": data.document_id,
         "question": data.question,
         "answer": answer,
         "sources": sources
     }
+
+    return response
