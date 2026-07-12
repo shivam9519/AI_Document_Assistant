@@ -29,80 +29,111 @@ router = APIRouter()
 )
 async def chat(data: QuestionRequest):
 
+    try:
 
-    # Check document exists
-    if data.document_id not in store.documents:
-        raise HTTPException(
-            status_code=404,
-            detail="Document not found."
+        # -----------------------------
+        # Check document exists
+        # -----------------------------
+        if data.document_id not in store.documents:
+            raise HTTPException(
+                status_code=404,
+                detail="Document not found."
+            )
+
+        document = store.documents[data.document_id]
+
+        index = document["faiss_index"]
+        chunks = document["chunks"]
+
+        # -----------------------------
+        # Generate embedding
+        # -----------------------------
+        question_embedding = generate_question_embedding(
+            data.question
         )
 
-    # Get selected document
-    document = store.documents[data.document_id]
+        # -----------------------------
+        # Search FAISS
+        # -----------------------------
+        distances, indices = search_index(
+            index,
+            question_embedding
+        )
 
-    index = document["faiss_index"]
-    chunks = document["chunks"]
+        if len(distances) == 0:
+            return {
+                "answer": "I couldn't find this information in the uploaded document.",
+                "sources": []
+            }
 
+        # -----------------------------
+        # Similarity check
+        # -----------------------------
+        if distances[0] > SIMILARITY_THRESHOLD:
+            return {
+                "answer": "I couldn't find this information in the uploaded document.",
+                "sources": []
+            }
 
-    # Generate question embedding
-    question_embedding = generate_question_embedding(
-        data.question
-    )
+        # -----------------------------
+        # Retrieve chunks
+        # -----------------------------
+        top_chunks = retrieve_chunks(
+            chunks,
+            indices
+        )
 
+        if len(top_chunks) == 0:
+            return {
+                "answer": "I couldn't find this information in the uploaded document.",
+                "sources": []
+            }
 
-    # Search FAISS
-    distances, indices = search_index(
-        index,
-        question_embedding
-    )
+        # -----------------------------
+        # Build context
+        # -----------------------------
+        context = ""
 
+        for chunk in top_chunks:
 
-    # Similarity threshold
-    if distances[0] > SIMILARITY_THRESHOLD:
-        return {
-            "answer": "I couldn't find this information in the uploaded document."
-        }
-
-    # Retrieve chunks
-    top_chunks = retrieve_chunks(
-        chunks,
-        indices
-    )
-
-    # Build context
-    context = ""
-
-    for chunk in top_chunks:
-        context += f"""
+            context += f"""
 Page {chunk['page']}:
 
 {chunk['text']}
 
 """
 
-    # Generate answer using Gemini
-    answer = generate_answer(
-        data.question,
-        context
-    )
-
-    logger.info(
-        f"Question answered for document {data.document_id}"
-    )
-
-    # Remove duplicate pages
-    sources = sorted(
-        set(
-            chunk["page"] for chunk in top_chunks
+        # -----------------------------
+        # Gemini
+        # -----------------------------
+        answer = generate_answer(
+            data.question,
+            context
         )
-    )
 
+        sources = sorted(
+            set(chunk["page"] for chunk in top_chunks)
+        )
 
-    response = {
-        "document_id": data.document_id,
-        "question": data.question,
-        "answer": answer,
-        "sources": sources
-    }
+        logger.info(
+            f"Question answered for document {data.document_id}"
+        )
 
-    return response
+        return {
+            "document_id": data.document_id,
+            "question": data.question,
+            "answer": answer,
+            "sources": sources
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+
+        logger.exception(e)
+
+        return {
+            "answer": "The AI service is temporarily unavailable. Please try again in a few minutes.",
+            "sources": []
+        }

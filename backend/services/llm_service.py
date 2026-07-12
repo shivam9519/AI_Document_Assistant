@@ -1,9 +1,12 @@
 import os
+import logging
 
 from dotenv import load_dotenv
 from google import genai
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
@@ -34,9 +37,29 @@ Question:
 Answer:
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
+    try:
 
-    return response.text
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+
+        return response.text
+
+    except Exception as error:
+
+        logger.exception("Gemini API Error")
+
+        error_message = str(error)
+
+        if "429" in error_message or "RESOURCE_EXHAUSTED" in error_message:
+
+            return (
+                "⚠️ Gemini API quota exceeded.\n\n"
+                "Please try again later or use another API key."
+            )
+
+        return (
+            "⚠️ Something went wrong while generating the answer.\n\n"
+            "Please try again."
+        )

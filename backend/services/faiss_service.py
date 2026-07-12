@@ -1,10 +1,12 @@
 import faiss
 import os
 import numpy as np
+
 from backend.config import TOP_K
 
 
 def create_faiss_index(embeddings):
+
     dimension = embeddings.shape[1]
 
     index = faiss.IndexFlatL2(dimension)
@@ -12,7 +14,6 @@ def create_faiss_index(embeddings):
     index.add(np.array(embeddings).astype("float32"))
 
     return index
-
 
 
 def search_index(index, question_embedding):
@@ -24,8 +25,18 @@ def search_index(index, question_embedding):
 
     return distances[0], indices[0]
 
+
 def retrieve_chunks(chunks, indices):
-    return [chunks[i] for i in indices]
+
+    retrieved_chunks = []
+
+    for i in indices:
+
+        if 0 <= i < len(chunks):
+
+            retrieved_chunks.append(chunks[i])
+
+    return retrieved_chunks
 
 
 def save_faiss_index(index, document_hash):
@@ -41,6 +52,7 @@ def save_faiss_index(index, document_hash):
 
     faiss.write_index(index, path)
 
+
 def index_exists(document_hash):
 
     path = os.path.join(
@@ -52,6 +64,7 @@ def index_exists(document_hash):
 
     return os.path.exists(path)
 
+
 def load_faiss_index(document_hash):
 
     path = os.path.join(
@@ -61,6 +74,4 @@ def load_faiss_index(document_hash):
         f"{document_hash}.index"
     )
 
-    index = faiss.read_index(path)
-
-    return index    
+    return faiss.read_index(path)
