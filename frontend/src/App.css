@@ -790,3 +790,98 @@ section{
     flex-shrink:0;
 
 }
+
+
+/* ===========================
+   Header V2
+=========================== */
+
+.app-header{
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color:white;
+
+    padding:28px 40px;
+
+    box-shadow:0 10px 30px rgba(37,99,235,.25);
+
+}
+
+.header-content{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+.header-content h1{
+
+    font-size:34px;
+
+    margin-bottom:8px;
+
+}
+
+.header-content p{
+
+    opacity:.9;
+
+}
+
+.new-chat-button{
+
+    background:white;
+
+    color:#2563eb;
+
+    border:none;
+
+    padding:12px 22px;
+
+    border-radius:14px;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.new-chat-button:hover{
+
+    transform:translateY(-2px);
+
+    background:#f8fafc;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+
+}
+
+@media(max-width:768px){
+
+    .header-content{
+
+        flex-direction:column;
+
+        text-align:center;
+
+    }
+
+}
