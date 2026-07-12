@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function ChatSection({
     question,
@@ -9,6 +9,8 @@ function ChatSection({
 }) {
 
     const chatContainerRef = useRef(null);
+
+    const [copiedIndex, setCopiedIndex] = useState(null);
 
     useEffect(() => {
 
@@ -25,6 +27,30 @@ function ChatSection({
 
         if (event.key === "Enter") {
             handleSend();
+        }
+
+    }
+
+    async function handleCopy(text, index) {
+
+        try {
+
+            await navigator.clipboard.writeText(text);
+
+            setCopiedIndex(index);
+
+            setTimeout(() => {
+
+                setCopiedIndex(null);
+
+            }, 2000);
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
         }
 
     }
@@ -57,11 +83,32 @@ function ChatSection({
                             className={`message ${message.role}`}
                         >
 
-                            <div className="message-header">
+                            <div className="message-top">
 
-                                {message.role === "user"
-                                    ? "👤 You"
-                                    : "🤖 AI"}
+                                <div className="message-header">
+
+                                    {message.role === "user"
+                                        ? "👤 You"
+                                        : "🤖 AI"}
+
+                                </div>
+
+                                {message.role === "assistant" && (
+
+                                    <button
+                                        className="copy-button"
+                                        onClick={() =>
+                                            handleCopy(message.text, index)
+                                        }
+                                    >
+
+                                        {copiedIndex === index
+                                            ? "✅ Copied"
+                                            : "📋 Copy"}
+
+                                    </button>
+
+                                )}
 
                             </div>
 
@@ -110,9 +157,11 @@ function ChatSection({
 
                         </div>
 
-                        <div className="message-body">
+                        <div className="message-body typing-loader">
 
-                            Thinking...
+                            <span></span>
+                            <span></span>
+                            <span></span>
 
                         </div>
 
