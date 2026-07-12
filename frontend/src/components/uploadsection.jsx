@@ -158,14 +158,21 @@ function UploadSection({ setDocumentId }) {
 
                         or click to browse
 
-                    </p>
+                  </p>
+                        <input
+                            id="pdf-upload"
+                            type="file"
+                            accept=".pdf"
+                            onChange={handleFileChange}
+                            hidden
+                        />
 
-                    <input
-                        id="pdf-upload"
-                        type="file"
-                        accept=".pdf"
-                        onChange={handleFileChange}
-                    />
+                        <label
+                            htmlFor="pdf-upload"
+                            className="browse-button"
+                        >
+                            📂 Browse PDF
+                        </label>
 
                 </label>
 
@@ -173,9 +180,9 @@ function UploadSection({ setDocumentId }) {
 
                     <div className="selected-file">
 
-                        <div>
+                        <div className="selected-file-name">
 
-                            📄 <strong>{file.name}</strong>
+                            📄 {file.name}
 
                         </div>
 
@@ -213,25 +220,15 @@ function UploadSection({ setDocumentId }) {
 
             {uploadResult && (
 
-                <div className="upload-success">
+               <div className="upload-success">
 
                     <strong>
-
-                        ✅ {uploadResult.filename}
-
+                        ✅ {uploadResult.filename} uploaded successfully.
                     </strong>
 
                     <p>
-
-                        Your document is ready.
-
+                        Ready to chat.
                     </p>
-
-                    <small>
-
-                        Start asking questions below.
-
-                    </small>
 
                 </div>
 

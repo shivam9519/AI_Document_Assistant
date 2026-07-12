@@ -78,41 +78,31 @@ function ChatSection({
 
                 ) : (
 
-                    messages.map((message, index) => (
+                                    messages.map((message, index) => (
 
-                        <div
-                            key={index}
-                            className={`message ${message.role}`}
-                        >
+                                        <div
+                                            key={index}
+                                            className={`message ${message.role}`}
+                                        >
+                                            {message.role === "assistant" && (
 
-                            <div className="message-top">
+                                            <div className="assistant-header">
 
-                                <div className="message-header">
+                                                <div className="assistant-avatar">
 
-                                    {message.role === "user"
-                                        ? "👤 You"
-                                        : "🤖 AI"}
+                                                    🤖
 
-                                </div>
+                                                </div>
 
-                                {message.role === "assistant" && (
+                                                <span>
 
-                                    <button
-                                        className="copy-button"
-                                        onClick={() =>
-                                            handleCopy(message.text, index)
-                                        }
-                                    >
+                                                    AI Assistant
 
-                                        {copiedIndex === index
-                                            ? "✅ Copied"
-                                            : "📋 Copy"}
+                                                </span>
 
-                                    </button>
+                                            </div>
 
-                                )}
-
-                            </div>
+                                        )}
 
                             <div className="message-body">
 
@@ -131,29 +121,51 @@ function ChatSection({
                                 )}
 
                             </div>
+                            {message.role === "assistant" && (
 
-                            {message.role === "assistant" &&
-                                message.sources &&
-                                message.sources.length > 0 && (
+                                <div className="message-footer">
 
-                                    <div className="message-sources">
+                                    {message.sources && message.sources.length > 0 && (
 
-                                        <strong>Sources:</strong>{" "}
+                                        <div className="message-sources">
 
-                                        {message.sources.map((page) => (
+                                            <span className="sources-label">
 
-                                            <span
-                                                key={page}
-                                                className="source-tag"
-                                            >
-                                                Page {page}
+                                                📄 Sources
+
                                             </span>
 
-                                        ))}
+                                            {message.sources.map((page) => (
 
-                                    </div>
+                                                <span
+                                                    key={page}
+                                                    className="source-tag"
+                                                >
+                                                    📄 Page {page}
+                                                </span>
 
-                                )}
+                                            ))}
+
+                                        </div>
+
+                                    )}
+
+                                    <button
+                                        className="copy-button"
+                                        onClick={() => handleCopy(message.text, index)}
+                                    >
+
+                                        {copiedIndex === index
+                                            ? "✅ Copied"
+                                            : "📋 Copy"}
+
+                                    </button>
+
+                                </div>
+
+                            )}
+
+                       
 
                         </div>
 
