@@ -1,5 +1,6 @@
 import { useState } from "react";
-
+import { toast } from "react-toastify";
+import "./App.css";
 import Header from "./components/Header";
 import UploadSection from "./components/UploadSection";
 import ChatSection from "./components/ChatSection";
@@ -14,79 +15,68 @@ function App() {
 
     const [loading, setLoading] = useState(false);
 
-    async function handleSend() {
+async function handleSend() {
 
-        if (!question.trim()) {
-            return;
-        }
+    if (!question.trim()) {
 
-        if (!documentId) {
-            alert("Please upload a PDF first.");
-            return;
-        }
+        toast.warning("Please enter a question.");
 
-        const userQuestion = question;
+        return;
+    }
+
+    if (!documentId) {
+
+        toast.warning("Please upload a PDF first.");
+
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/chat",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    document_id: documentId,
+                    question: question,
+                }),
+            }
+        );
+
+        const data = await response.json();
+
+        const userMessage = {
+            role: "user",
+            text: question,
+        };
+
+        const aiMessage = {
+            role: "assistant",
+            text: data.answer,
+            sources: data.sources || [],
+        };
+
+        setMessages((previous) => [
+            ...previous,
+            userMessage,
+            aiMessage,
+        ]);
 
         setQuestion("");
 
-        setLoading(true);
+    } catch (error) {
 
-        try {
+        console.error(error);
 
-            const response = await fetch(
-                "http://127.0.0.1:8000/chat",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-
-                    body: JSON.stringify({
-                        document_id: documentId,
-                        question: userQuestion,
-                    }),
-                }
-            );
-
-            const data = await response.json();
-
-            console.log(data);
-
-            setMessages((previousMessages) => [
-
-                ...previousMessages,
-
-                {
-                    role: "user",
-                    text: userQuestion,
-                },
-
-                {
-                    role: "assistant",
-                    text: data.answer,
-                    sources: data.sources,
-                },
-
-            ]);
-
-        }
-
-        catch (error) {
-
-            console.error(error);
-
-            alert("Something went wrong.");
-
-        }
-
-        finally {
-
-            setLoading(false);
-
-        }
+        toast.error("Something went wrong.");
 
     }
+
+}
 
     return (
 

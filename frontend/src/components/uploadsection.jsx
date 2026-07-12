@@ -1,28 +1,78 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 function UploadSection({ setDocumentId }) {
 
     const [file, setFile] = useState(null);
     const [uploadResult, setUploadResult] = useState(null);
     const [uploading, setUploading] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [dragActive, setDragActive] = useState(false);
+
+    function validateFile(selectedFile) {
+
+        if (!selectedFile) return;
+
+        if (selectedFile.type !== "application/pdf") {
+
+            toast.error("Please select a PDF file.");
+
+            return;
+
+        }
+
+        setFile(selectedFile);
+
+    }
 
     function handleFileChange(event) {
-        const selectedFile = event.target.files[0];
-        setFile(selectedFile);
+
+        validateFile(event.target.files[0]);
+
+    }
+
+    function handleDragOver(event) {
+
+        event.preventDefault();
+
+        setDragActive(true);
+
+    }
+
+    function handleDragLeave(event) {
+
+        event.preventDefault();
+
+        setDragActive(false);
+
+    }
+
+    function handleDrop(event) {
+
+        event.preventDefault();
+
+        setDragActive(false);
+
+        const droppedFile = event.dataTransfer.files[0];
+
+        validateFile(droppedFile);
+
     }
 
     async function handleUpload() {
 
         if (!file) {
-            alert("Please select a PDF first.");
+
+            toast.warning("Please select a PDF first.");
+
             return;
+
         }
 
-        const formData = new FormData();
-        formData.append("file", file);
-
         setUploading(true);
+
+        const formData = new FormData();
+
+        formData.append("file", file);
 
         try {
 
@@ -36,19 +86,23 @@ function UploadSection({ setDocumentId }) {
 
             const data = await response.json();
 
-            console.log(data);
-
             setUploadResult(data);
 
             setDocumentId(data.document_id);
 
-        } catch (error) {
+            toast.success("PDF uploaded successfully.");
+
+        }
+
+        catch (error) {
 
             console.error(error);
 
-            alert("Upload Failed!");
+            toast.error("Upload failed.");
 
-        } finally {
+        }
+
+        finally {
 
             setUploading(false);
 
@@ -58,40 +112,126 @@ function UploadSection({ setDocumentId }) {
 
     return (
 
-        <section className="upload-section">
+        <section className="upload-card">
 
-            <h2>📄 Upload PDF</h2>
+            <div className="upload-icon">
 
-            <div className="upload-box">
-
-                <input
-                    type="file"
-                    onChange={handleFileChange}
-                />
-
-                <button
-                    onClick={handleUpload}
-                    disabled={uploading}
-                >
-                    {uploading ? "Uploading..." : "Upload"}
-                </button>
+                📄
 
             </div>
 
-            {file && (
-                <p className="selected-file">
+            <h2>
 
-                    Selected File:
-                    <strong> {file.name}</strong>
+                Upload Your PDF
 
-                </p>
-            )}
+            </h2>
+
+            <p className="upload-subtitle">
+
+                Upload a PDF and start chatting with your document using AI.
+
+            </p>
+
+            <div className="upload-area">
+
+                <label
+                    htmlFor="pdf-upload"
+                    className={`upload-drop-zone ${dragActive ? "drag-active" : ""}`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                >
+
+                    <div className="upload-drop-icon">
+
+                        ☁️
+
+                    </div>
+
+                    <h3>
+
+                        Drag & Drop your PDF
+
+                    </h3>
+
+                    <p>
+
+                        or click to browse
+
+                    </p>
+
+                    <input
+                        id="pdf-upload"
+                        type="file"
+                        accept=".pdf"
+                        onChange={handleFileChange}
+                    />
+
+                </label>
+
+                {file ? (
+
+                    <div className="selected-file">
+
+                        <div>
+
+                            📄 <strong>{file.name}</strong>
+
+                        </div>
+
+                        <span>
+
+                            Ready to upload
+
+                        </span>
+
+                    </div>
+
+                ) : (
+
+                    <div className="upload-placeholder">
+
+                        No PDF selected
+
+                    </div>
+
+                )}
+
+            </div>
+
+            <button
+                className="upload-button"
+                onClick={handleUpload}
+                disabled={uploading}
+            >
+
+                {uploading
+                    ? "Uploading..."
+                    : "Upload PDF"}
+
+            </button>
 
             {uploadResult && (
 
                 <div className="upload-success">
 
-                    ✅ <strong>{uploadResult.filename}</strong> uploaded successfully.
+                    <strong>
+
+                        ✅ {uploadResult.filename}
+
+                    </strong>
+
+                    <p>
+
+                        Your document is ready.
+
+                    </p>
+
+                    <small>
+
+                        Start asking questions below.
+
+                    </small>
 
                 </div>
 
@@ -100,6 +240,7 @@ function UploadSection({ setDocumentId }) {
         </section>
 
     );
+
 }
 
 export default UploadSection;

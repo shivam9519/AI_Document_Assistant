@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 function ChatSection({
     question,
@@ -114,7 +116,19 @@ function ChatSection({
 
                             <div className="message-body">
 
-                                {message.text}
+                                {message.role === "assistant" ? (
+
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm]}
+                                    >
+                                        {message.text}
+                                    </ReactMarkdown>
+
+                                ) : (
+
+                                    message.text
+
+                                )}
 
                             </div>
 
