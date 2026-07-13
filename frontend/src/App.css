@@ -1246,3 +1246,134 @@ section{
     box-shadow:0 0 0 3px rgba(37,99,235,.15);
 
 }
+
+/* ===========================
+   Header Layout
+=========================== */
+
+.header-content{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+.theme-toggle{
+
+    padding:12px 18px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:white;
+
+    color:#2563eb;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.theme-toggle:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+
+}
+
+/* ===========================
+   Dark Theme
+=========================== */
+
+.dark{
+
+    background:#111827;
+
+    color:#f9fafb;
+
+}
+
+.dark body{
+
+    background:#111827;
+
+}
+
+.dark section,
+
+.dark .sidebar{
+
+    background:#1f2937;
+
+    color:#f9fafb;
+
+}
+
+.dark .document-item{
+
+    background:#374151;
+
+    color:white;
+
+}
+
+.dark .document-item.active{
+
+    background:#2563eb;
+
+}
+
+.dark input{
+
+    background:#374151;
+
+    color:white;
+
+    border-color:#4b5563;
+
+}
+
+.dark .chat-input input{
+
+    background:#374151;
+
+    color:white;
+
+}
+
+.dark .message.assistant{
+
+    background:#374151;
+
+    color:white;
+
+}
+
+.dark .copy-button{
+
+    background:#374151;
+
+    color:white;
+
+    border-color:#4b5563;
+
+}
+
+.dark .theme-toggle{
+
+    background:#374151;
+
+    color:white;
+
+}
+

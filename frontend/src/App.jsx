@@ -21,6 +21,15 @@ function App() {
 });
 
     const [question, setQuestion] = useState("");
+    const [darkMode, setDarkMode] = useState(() => {
+
+    const savedTheme = localStorage.getItem("darkMode");
+
+    return savedTheme
+        ? JSON.parse(savedTheme)
+        : false;
+
+});
 
     const [messages, setMessages] = useState([]);
     const [currentChatId, setCurrentChatId] = useState(null);
@@ -93,6 +102,15 @@ useEffect(() => {
     setMessages(chatHistory[document.id] || []);
 
 }, [document, chatHistory]);
+
+useEffect(() => {
+
+    localStorage.setItem(
+        "darkMode",
+        JSON.stringify(darkMode)
+    );
+
+}, [darkMode]);
 
     async function handleSend() {
         console.log(document);
@@ -271,7 +289,13 @@ function handleDeleteDocument(documentId) {
 
    return (
 
-    <div className="app-layout">
+    <div
+    className={
+        darkMode
+            ? "app-layout dark"
+            : "app-layout"
+    }
+>
 <Sidebar
     handleNewChat={handleNewChat}
     documents={documents}
@@ -283,11 +307,12 @@ function handleDeleteDocument(documentId) {
 />
 
         <div className="app-content">
-
-            <Header
-                title="AI Document Assistant"
-                subtitle="Chat with your PDF using AI"
-            />
+<Header
+    title="AI Document Assistant"
+    subtitle="Chat with your PDF using AI"
+    darkMode={darkMode}
+    setDarkMode={setDarkMode}
+/>
 
             <main>
 
