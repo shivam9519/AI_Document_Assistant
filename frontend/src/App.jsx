@@ -5,10 +5,11 @@ import "./App.css";
 import Header from "./components/Header";
 import UploadSection from "./components/UploadSection";
 import ChatSection from "./components/ChatSection";
+import DocumentInfo from "./components/DocumentInfo";
 
 function App() {
 
-    const [documentId, setDocumentId] = useState(null);
+    const [document, setDocument] = useState(null);
 
     const [question, setQuestion] = useState("");
 
@@ -26,7 +27,7 @@ function App() {
 
         }
 
-        if (!documentId) {
+        if (!document) {
 
             toast.warning("Please upload a PDF first.");
 
@@ -46,7 +47,7 @@ function App() {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        document_id: documentId,
+                        document_id: document.id,
                         question: question,
                     }),
                 }
@@ -115,18 +116,21 @@ function App() {
 
             <main>
 
-                <UploadSection
-                    setDocumentId={setDocumentId}
-                />
+                 <UploadSection
+                            setDocument={setDocument}
+                        />
 
-                <ChatSection
-                    question={question}
-                    setQuestion={setQuestion}
-                    handleSend={handleSend}
-                    messages={messages}
-                    loading={loading}
-                />
+                        <DocumentInfo
+                            document={document}
+                        />
 
+                        <ChatSection
+                            question={question}
+                            setQuestion={setQuestion}
+                            handleSend={handleSend}
+                            messages={messages}
+                            loading={loading}
+                />
             </main>
 
         </>

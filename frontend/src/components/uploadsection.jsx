@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-function UploadSection({ setDocumentId }) {
+function UploadSection({ setDocument })  {
 
     const [file, setFile] = useState(null);
     const [uploadResult, setUploadResult] = useState(null);
@@ -88,7 +88,17 @@ function UploadSection({ setDocumentId }) {
 
             setUploadResult(data);
 
-            setDocumentId(data.document_id);
+            setDocument({
+
+    id: data.document_id,
+
+    filename: data.filename,
+
+    totalChunks: data.total_chunks,
+
+    vectors: data.vectors_in_faiss,
+
+});
 
             toast.success("PDF uploaded successfully.");
 

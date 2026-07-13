@@ -885,3 +885,91 @@ section{
     }
 
 }
+
+/* ===========================
+   Document Information Card
+=========================== */
+
+.document-info-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    padding:20px;
+
+    margin-bottom:30px;
+
+    background:white;
+
+    border-radius:18px;
+
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+
+}
+
+.document-icon{
+
+    font-size:46px;
+
+}
+
+.document-details{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+.document-details h3{
+
+    font-size:22px;
+
+    color:#1f2937;
+
+}
+
+.document-details p{
+
+    color:#16a34a;
+
+    font-weight:600;
+
+}
+
+.document-details small{
+
+    color:#6b7280;
+
+}
+
+.document-meta{
+
+    display:flex;
+
+    gap:25px;
+
+    margin-top:6px;
+
+    color:#6b7280;
+
+    font-size:14px;
+
+    flex-wrap:wrap;
+
+}
+
+.document-meta span{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+}
