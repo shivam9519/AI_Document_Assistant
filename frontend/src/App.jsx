@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 import { toast } from "react-toastify";
 import "./App.css";
 
@@ -6,7 +7,7 @@ import Header from "./components/Header";
 import UploadSection from "./components/UploadSection";
 import ChatSection from "./components/ChatSection";
 import DocumentInfo from "./components/DocumentInfo";
-
+import Sidebar from "./components/Sidebar";
 function App() {
 
     const [document, setDocument] = useState(null);
@@ -14,10 +15,30 @@ function App() {
     const [question, setQuestion] = useState("");
 
     const [messages, setMessages] = useState([]);
+    const [currentChatId, setCurrentChatId] = useState(null);
 
     const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [documents, setDocuments] = useState(() => {
+
+    const saved = localStorage.getItem("documents");
+
+    return saved ? JSON.parse(saved) : [];
+
+});
+    const [chatHistory, setChatHistory] = useState({});
+        useEffect(() => {
+
+    localStorage.setItem(
+        "documents",
+        JSON.stringify(documents)
+    );
+
+}, [documents]);
+   
 
     async function handleSend() {
+        console.log(document);
 
         if (!question.trim()) {
 
@@ -66,11 +87,22 @@ function App() {
                 sources: data.sources || [],
             };
 
-            setMessages(previous => [
-                ...previous,
-                userMessage,
-                aiMessage,
-            ]);
+                 setMessages((previousMessages) => {
+
+    const updatedMessages = [
+        ...previousMessages,
+        userMessage,
+        aiMessage,
+    ];
+
+    setChatHistory((previousHistory) => ({
+        ...previousHistory,
+        [document.id]: updatedMessages,
+    }));
+
+    return updatedMessages;
+
+});
 
             setQuestion("");
 
@@ -94,48 +126,138 @@ function App() {
 
     function handleNewChat() {
 
-        setMessages([]);
+    if (!document) {
+        toast.warning("Select a document first.");
+        return;
+    }
 
-        setQuestion("");
+    const newChatId = Date.now().toString();
 
-        setLoading(false);
+    setCurrentChatId(newChatId);
 
-        toast.success("Started a new chat.");
+    setMessages([]);
+
+    setQuestion("");
+
+    setLoading(false);
+
+    setChatHistory((previous) => ({
+
+        ...previous,
+
+        [document.id]: [
+
+            ...(previous[document.id] || []),
+
+            {
+                id: newChatId,
+                messages: [],
+            },
+
+        ],
+
+    }));
+
+    toast.success("New chat created.");
+
+}
+   function handleSelectDocument(doc) {
+
+    console.log("Selected:", doc.id);
+
+    console.log("History:", chatHistory);
+
+    setDocument(doc);
+
+    setMessages(chatHistory[doc.id] || []);
+
+}
+
+function handleDeleteDocument(documentId) {
+
+    const updatedDocuments = documents.filter(
+        (doc) => doc.id !== documentId
+    );
+
+    setDocuments(updatedDocuments);
+
+    setChatHistory((previous) => {
+
+        const updatedHistory = { ...previous };
+
+        delete updatedHistory[documentId];
+
+        return updatedHistory;
+
+    });
+
+    if (document?.id === documentId) {
+
+        if (updatedDocuments.length > 0) {
+
+            handleSelectDocument(updatedDocuments[0]);
+
+        } else {
+
+            setDocument(null);
+
+            setMessages([]);
+
+        }
 
     }
 
-    return (
+    toast.success("Document deleted.");
 
-        <>
+}
+    console.log(document);
+
+   return (
+
+    <div className="app-layout">
+<Sidebar
+    handleNewChat={handleNewChat}
+    documents={documents}
+    setDocument={handleSelectDocument}
+    selectedDocument={document}
+    handleDeleteDocument={handleDeleteDocument}
+    searchTerm={searchTerm}
+    setSearchTerm={setSearchTerm}
+/>
+
+        <div className="app-content">
 
             <Header
                 title="AI Document Assistant"
                 subtitle="Chat with your PDF using AI"
-                onNewChat={handleNewChat}
             />
 
             <main>
 
-                 <UploadSection
-                            setDocument={setDocument}
-                        />
+                <UploadSection
+                        setDocument={setDocument}
+                        setDocuments={setDocuments}
+                    />
 
-                        <DocumentInfo
-                            document={document}
-                        />
-
-                        <ChatSection
-                            question={question}
-                            setQuestion={setQuestion}
-                            handleSend={handleSend}
-                            messages={messages}
-                            loading={loading}
+                <DocumentInfo
+                    document={document}
                 />
+
+                <ChatSection
+                    question={question}
+                    setQuestion={setQuestion}
+                    handleSend={handleSend}
+                    messages={messages}
+                    loading={loading}
+                />
+
             </main>
 
-        </>
+        </div>
 
-    );
+    </div>
+
+);
 
 }
 

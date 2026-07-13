@@ -1,14 +1,12 @@
 function Header({
     title,
     subtitle,
-    onNewChat,
 }) {
 
     return (
 
         <header className="app-header">
 
-            <div className="header-content">
 
                 <div>
 
@@ -18,16 +16,9 @@ function Header({
 
                 </div>
 
-                <button
-                    className="new-chat-button"
-                    onClick={onNewChat}
-                >
+               
 
-                    ✨ New Chat
-
-                </button>
-
-            </div>
+          
 
         </header>
 
