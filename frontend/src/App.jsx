@@ -10,7 +10,15 @@ import DocumentInfo from "./components/DocumentInfo";
 import Sidebar from "./components/Sidebar";
 function App() {
 
-    const [document, setDocument] = useState(null);
+    const [document, setDocument] = useState(() => {
+
+    const savedDocument = localStorage.getItem("selectedDocument");
+
+    return savedDocument
+        ? JSON.parse(savedDocument)
+        : null;
+
+});
 
     const [question, setQuestion] = useState("");
 
@@ -26,7 +34,16 @@ function App() {
     return saved ? JSON.parse(saved) : [];
 
 });
-    const [chatHistory, setChatHistory] = useState({});
+   const [chatHistory, setChatHistory] = useState(() => {
+
+    const savedHistory = localStorage.getItem("chatHistory");
+
+    return savedHistory
+        ? JSON.parse(savedHistory)
+        : {};
+
+});
+
         useEffect(() => {
 
     localStorage.setItem(
@@ -35,7 +52,47 @@ function App() {
     );
 
 }, [documents]);
+
+useEffect(() => {
+
+    localStorage.setItem(
+        "chatHistory",
+        JSON.stringify(chatHistory)
+    );
+
+}, [chatHistory]);
    
+useEffect(() => {
+
+    if (document) {
+
+        localStorage.setItem(
+            "selectedDocument",
+            JSON.stringify(document)
+        );
+
+    } else {
+
+        localStorage.removeItem("selectedDocument");
+
+    }
+
+}, [document]);
+
+
+useEffect(() => {
+
+    if (!document) {
+
+        setMessages([]);
+
+        return;
+
+    }
+
+    setMessages(chatHistory[document.id] || []);
+
+}, [document, chatHistory]);
 
     async function handleSend() {
         console.log(document);
