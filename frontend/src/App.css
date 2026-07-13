@@ -1056,7 +1056,7 @@ section{
 .app-layout{
 
     display:flex;
-
+    
     min-height:100vh;
 
 }
@@ -1066,7 +1066,7 @@ section{
     flex:1;
 
     display:flex;
-
+    width: 100%;
     flex-direction:column;
 
 }
