@@ -136,7 +136,7 @@ useEffect(() => {
         try {
 
             const response = await fetch(
-                "http://127.0.0.1:8000/chat",
+               `${import.meta.env.VITE_API_URL}/chat`,
                 {
                     method: "POST",
                     headers: {
