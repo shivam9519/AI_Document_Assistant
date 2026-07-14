@@ -9,9 +9,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "https://ai-document-assistant-edca-c0h2j9z1y-shiku.vercel.app",
+        "https://shiku-ai-document-assistant.onrender.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
