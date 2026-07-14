@@ -40,7 +40,7 @@ Answer:
     try:
 
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-flash-latest",
             contents=prompt
         )
 
@@ -49,7 +49,7 @@ Answer:
     except Exception as error:
 
         logger.exception("Gemini API Error")
-
+        print("REAL ERROR:", error) 
         error_message = str(error)
 
         if "429" in error_message or "RESOURCE_EXHAUSTED" in error_message:
