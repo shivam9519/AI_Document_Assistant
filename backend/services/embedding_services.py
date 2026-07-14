@@ -1,19 +1,44 @@
-from sentence_transformers import SentenceTransformer
+import os
+from google import genai
+from dotenv import load_dotenv
+import numpy as np
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+load_dotenv()
+
+client = genai.Client(
+    api_key=os.getenv("GEMINI_API_KEY")
+)
+
+EMBEDDING_MODEL = "gemini-embedding-001"
 
 
 def generate_embeddings(chunks: list):
 
     texts = [chunk["text"] for chunk in chunks]
 
-    embeddings = model.encode(texts)
+    result = client.models.embed_content(
+        model=EMBEDDING_MODEL,
+        contents=texts
+    )
+
+    embeddings = np.array(
+        [e.values for e in result.embeddings],
+        dtype="float32"
+    )
 
     return embeddings
 
 
 def generate_question_embedding(question: str):
 
-    embedding = model.encode([question])
+    result = client.models.embed_content(
+        model=EMBEDDING_MODEL,
+        contents=[question]
+    )
+
+    embedding = np.array(
+        [e.values for e in result.embeddings],
+        dtype="float32"
+    )
 
     return embedding
