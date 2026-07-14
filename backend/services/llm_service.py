@@ -55,6 +55,13 @@ Answer:
         if "429" in error_message or "RESOURCE_EXHAUSTED" in error_message:
 
             return (
+            "⚠️ Gemini API quota exceeded.\n\n"
+            "Please try again later or use another API key."
+        )
+
+        if "429" in error_message or "RESOURCE_EXHAUSTED" in error_message:
+
+            return (
                 "⚠️ Gemini API quota exceeded.\n\n"
                 "Please try again later or use another API key."
             )
